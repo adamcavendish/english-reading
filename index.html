@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>研究生英语阅读</title>
+  <link href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div class="container">
+    <div style="width: 40%;">
+      <h1>研究生英语阅读</h1>
+      <div id="DivMessage">
+      </div>
+      <form id="FormGoForEnglishReading" class='form-horizontal'>
+        <div class="form-group">
+          <div class="input-group">
+              <span class="input-group-addon" id="basic-addon1">学号</span>
+              <input type="text" name="student_id" class="form-control" placeholder="学号" aria-describedby="basic-addon1">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="input-group">
+              <span class="input-group-addon" id="basic-addon2">密码</span>
+              <input type="password" name="password" class="form-control" placeholder="密码" aria-describedby="basic-addon2">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-primary" onclick="goForEnglishReading(5)">5分钟</button>
+            <button type="button" class="btn btn-primary" onclick="goForEnglishReading(30)">30分钟</button>
+            <button type="button" class="btn btn-primary" onclick="goForEnglishReading(60 + Math.random()*5|0)">60分钟左右</button>
+            <button type="button" class="btn btn-primary" onclick="goForEnglishReading(60*3 + Math.random()*15|0)">3小时左右</button>
+          </div>
+          <button type="button" class="btn btn-success" onclick="checkEnglishReading()">查看状态</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function goForEnglishReading(count) {
+      var student_id = $('input[name=student_id]')[0].value;
+      var password = $('input[name=password]')[0].value;
+
+      if (student_id.length == 0 || password.length == 0) {
+        $("#DivMessage").append('<p class="bg-info">学号或者密码不能为空</p>');
+        return false;
+      }
+
+      $.post("/", {
+        'student_id': student_id,
+        'password': password,
+        'count': count
+      },
+      function (data) {
+        console.log(data);
+        var msg = {
+          'GOING': '<p class="bg-info">正在进行中</p>',
+          'AVAIL': '<p class="bg-info">空闲</p>',
+          'SUCCESS': '<p class="bg-info">完成!</p>',
+          'CREATE': '<p class="bg-info">成功创建任务</p>',
+          'ERR_LOGIN_INFO': '<p class="bg-info">登录信息有误</p>',
+          'ERR_CAPTCHA_FAILED': '<p class="bg-info">验证码识别错误，请重新尝试</p>',
+          'ERR_UNKNOWN': '<p class="bg-info">出现错误，请重新尝试</p>',
+        };
+        // 这是扬华教的
+        var ptag = msg[data] || '<p class="bg-info">出现错误，请重新尝试</p>';
+        $("#DivMessage").append(ptag);
+      });
+      return true;
+    }
+
+    function checkEnglishReading() {
+      var student_id = $('input[name=student_id]')[0].value;
+
+      if (student_id.length == 0) {
+        $("#DivMessage").append('<p class="bg-info">学号不能为空</p>');
+        return false;
+      }
+
+      $.post("/check/", {
+        'student_id': student_id,
+      },
+      function (data) {
+        console.log(data);
+        var msg = {
+          'GOING': '<p class="bg-info">正在进行中</p>',
+          'AVAIL': '<p class="bg-info">空闲</p>',
+          'SUCCESS': '<p class="bg-info">完成!</p>',
+          'CREATE': '<p class="bg-info">成功创建任务</p>',
+          'ERR_LOGIN_INFO': '<p class="bg-info">登录信息有误</p>',
+          'ERR_CAPTCHA_FAILED': '<p class="bg-info">验证码识别错误，请重新尝试</p>',
+          'ERR_UNKNOWN': '<p class="bg-info">出现错误，请重新尝试</p>',
+        };
+        // 这是扬华教的
+        var ptag = msg[data] || '<p class="bg-info">出现错误，请重新尝试</p>';
+        $("#DivMessage").append(ptag);
+      });
+      return true;
+    }
+  </script>
+  <script src="//cdn.bootcss.com/jquery/2.1.4/jquery.min.js"></script>
+  <script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+</body>
+
+</html>
