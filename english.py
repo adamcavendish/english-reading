@@ -75,7 +75,8 @@ def tryLogin(student_id, student_passwd, vcode, cookiedict, logger):
 
 def trySendTimePackets(student_id, cookiedict, count, logger):
     english_url = 'http://202.120.126.58/timeTotal.asp'
-    articles = [564,489,490,491,492,504,505,506,507,508]
+    articles = [564,489,490,491,492,504,505,506,507,508,
+                522,523,524,525,526,537,538,539,540,541]
     data = {
         'ExecID': str(articles[int(math.floor(random.random() * 10))]),
         'StudentID': student_id,
@@ -109,4 +110,3 @@ def GoForEnglishReading(student_id, student_passwd, count, logger):
 
     trySendTimePackets(student_id, cookiedict, count, logger)
     return 'SUCCESS'
-
