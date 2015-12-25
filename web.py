@@ -10,6 +10,7 @@ redis_conn = Redis(host='localhost', port=6379)
 rq_queue = rq.Queue(connection=redis_conn)
 Going = {}
 
+
 def checkGoing(student_id, Going):
     logger = logging.getLogger(student_id)
     logger.info(str(Going))
@@ -26,11 +27,13 @@ def checkGoing(student_id, Going):
     else:
         return 'ERR_UNKNOWN'
 
+
 @route('/')
 def index():
     with open('index.html', 'r') as f:
         index = f.read()
     return template(index)
+
 
 @route('/', method='POST')
 def index_post():
@@ -44,13 +47,14 @@ def index_post():
         return 'FAILURE'
 
     flag = Going.get(student_id)
-    if not flag is None:
+    if flag is not None:
         return checkGoing(student_id, Going)
 
     job = rq_queue.enqueue(english.GoForEnglishReadingInQueue, student_id, password, count, Going)
     Going[student_id] = job
 
     return 'CREATE'
+
 
 @route('/check/', method='POST')
 def check():
@@ -59,7 +63,6 @@ def check():
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG,
-        format='%(asctime)s %(name)-10s %(levelname)-7s %(message)s',
-        datefmt='%m-%d-%H:%M', filename='web.log', filemode='w')
+                        format='%(asctime)s %(name)-10s %(levelname)-7s %(message)s',
+                        datefmt='%m-%d-%H:%M', filename='web.log', filemode='w')
     run(host='0.0.0.0', port=12345)
-

@@ -11,13 +11,15 @@ import logging
 from PIL import Image, ImageEnhance, ImageFilter
 
 logging.basicConfig(level=logging.DEBUG,
-    format='%(asctime)s %(name)-10s %(levelname)-7s %(message)s',
-    datefmt='%m-%d-%H:%M', filename='web.log', filemode='w')
+                    format='%(asctime)s %(name)-10s %(levelname)-7s %(message)s',
+                    datefmt='%m-%d-%H:%M', filename='web.log', filemode='w')
+
 
 def GoForEnglishReadingInQueue(student_id, student_passwd, count, Going):
     logger = logging.getLogger(student_id)
     ret = GoForEnglishReading(student_id, student_passwd, count, logger)
     return ret
+
 
 def getIndex():
     index_url = 'http://202.120.126.58/index.asp'
@@ -29,6 +31,7 @@ def getIndex():
     index = requests.get(index_url, headers=headers)
     cookiedict = dict(index.cookies)
     return cookiedict
+
 
 def tryCaptcha(student_id, cookiedict):
     captcha_url = 'http://202.120.126.58/VerifyCode.asp'
@@ -49,6 +52,7 @@ def tryCaptcha(student_id, cookiedict):
     vcode = pytesseract.image_to_string(im, config="-psm 6")
     return vcode
 
+
 def tryLogin(student_id, student_passwd, vcode, cookiedict, logger):
     login_url = 'http://202.120.126.58/index.asp?step=login'
     data = {
@@ -60,7 +64,7 @@ def tryLogin(student_id, student_passwd, vcode, cookiedict, logger):
         'submit.x': math.floor(1 + random.random() * 20),
         'submit.y': math.floor(1 + random.random() * 20),
     }
-    login = requests.post(login_url, data = data, cookies=cookiedict)
+    login = requests.post(login_url, data=data, cookies=cookiedict)
 
     if login.content.count('frmLogin.txtID.focus();') > 1:
         # Login info error
@@ -73,22 +77,25 @@ def tryLogin(student_id, student_passwd, vcode, cookiedict, logger):
     else:
         return 'SUCCESS'
 
+
 def trySendTimePackets(student_id, cookiedict, count, logger):
     english_url = 'http://202.120.126.58/timeTotal.asp'
-    articles = [564,489,490,491,492,504,505,506,507,508,
-                522,523,524,525,526,537,538,539,540,541]
+    articles = [564, 489, 490, 491, 492, 504, 505, 506, 507, 508,
+                522, 523, 524, 525, 526, 537, 538, 539, 540, 541]
     data = {
         'ExecID': str(articles[int(math.floor(random.random() * 10))]),
         'StudentID': student_id,
     }
     logger.info('{} start!'.format(student_id))
-    for i in range(0,count):
-        english = requests.post(english_url, data = data, cookies=cookiedict)
+    for i in range(0, count):
+        english = requests.post(english_url, data=data, cookies=cookiedict)
         if english.content != '<?xml version="1.0" encoding="utf-8" ?><TimeTotal><Result>0</Result></TimeTotal>':
             loggger.error("GoForEnglishReading {} error: {}".format(i, english.content))
     logger.info('{} finish!'.format(student_id))
 
 # @return values: ['ERR_LOGIN_INFO', 'ERR_CAPTCHA_FAILED', 'SUCCESS']
+
+
 def GoForEnglishReading(student_id, student_passwd, count, logger):
     retry_times = 10
 
